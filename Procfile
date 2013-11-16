@@ -1,1 +1,1 @@
-worker: target/bin/worker -Dorg.marketcetera.appDir="."
+worker: sh ./ors.sh
