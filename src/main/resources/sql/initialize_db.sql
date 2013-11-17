@@ -1,3 +1,8 @@
+/*
+  useage:
+    mysql -h $dbhost -P $dbport --verbose -u $dbuser --password=$dbpasswd --database=marketcetera < $sqldir/initialize_db.sql 2>&1
+*/
+
 DROP TABLE IF EXISTS id_repository;
 
 DROP TABLE IF EXISTS execreports;
