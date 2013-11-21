@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DB_URL=$CLEARDB_DATABASE_URL
+[ -z "$DB_URL" ] && echo "Warning: Please set DB_URL!"
 # extract the protocol
 proto=`echo $DB_URL | grep '://' | sed -e 's,^\(.*://\).*,\1,g'`
 
