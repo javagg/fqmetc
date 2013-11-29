@@ -14,13 +14,7 @@ cp $SPEC_FILE $BUILD_DIR
 pushd $BASE_DIR > /dev/null
   # Can't use `tito build --test --tgz` to generate tar ball because 
   # `tito tag` failed on centos/rhel 6, we emulate by tarring it manully
-  #tito build --test --tgz -o $BUILD_DIR
-  _commit=`git log -n 1 | grep 'commit' | cut -d ' ' -f 2`
-  _last_tag=`git describe $(git rev-list --tags --max-count=1)`
-  _commit_count=`git log --oneline ${_last_tag}.. | wc -l`
-  _commit=${_commit:0:7}
-  _ballname=${_name}-git-${_commit_count}.${_commit}
-  git archive --format=tar --prefix=$_ballname/ HEAD | gzip > $BUILD_DIR/${_ballname}.tar.gz
+  tito build --test --tgz -o $BUILD_DIR
 popd > /dev/null
 
 SPEC_FILE="$BUILD_DIR/$(basename $SPEC_FILE)"

@@ -14,13 +14,15 @@ License:       GPLv3
 URL:           http://www.marketcetera.org
 Source0:       %{name}-%{version}.tar.gz
 
-Requires:      java >= 1:1.7.0
-Requires:      jpackage-utils
-
-BuildRequires: java-devel >= 1:1.7.0
+Requires:      java-1.7.0-openjdk
+Requires:      java-1.7.0-openjdk-devel
 BuildRequires: jpackage-utils
-BuildRequires: javapackages-tools >= 0.7.0
+%if 0%{?fedora} >= 19
 BuildRequires: maven
+%endif
+%if 0%{?rhel} >= 6
+BuildRequires: maven3
+%endif
 
 BuildArch:     noarch
 
