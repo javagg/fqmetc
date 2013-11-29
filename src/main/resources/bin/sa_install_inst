@@ -1,0 +1,130 @@
+#!/bin/bash -eu
+
+ME=`readlink "$0" || echo "$0"`
+BASEDIR=$(cd "`dirname $ME`/../" && pwd)
+
+function absolute_path() {
+  local ret=$1 
+  pushd $ret > /dev/null
+    ret=`pwd`
+  popd > /dev/null
+  echo $ret
+}
+
+function usage() {
+  echo "usage: $0 [option]" 1>&2
+  echo "option:" 1>&2
+  echo "  -h, --help               Display this message and exit." 1>&2
+  echo "  -v, --verbose            Verbose mode." 1>&2
+  echo "  -o, --output             Write configuration to a file." 1>&2
+  echo "  -d, --destdir            Instance directory." 1>&2
+  echo "  -r, --rundir             Runtime directory." 1>&2
+  echo "  -l, --logdir             Log directory." 1>&2
+  echo "      --sa-host            Default: localhost" 1>&2
+  echo "      --sa-activemq-port   Default: 61619" 1>&2
+  echo "      --sa-ws-port         Default: 9003" 1>&2
+  echo "      --ors-host           Default: localhost" 1>&2
+  echo "      --ors-activemq-port  Default: 61618" 1>&2
+  echo "      --ors-ws-port        Default: 9002" 1>&2
+}
+ 
+# Default values
+verbose=0
+destdir=
+
+# Parse arguments
+eval set -- "$(getopt -n "$0" -o "hvo:d:r:l:" -l "help,verbose,output:,destdir:,rundir:,logdir:,sa-host:,sa-activemq-port:,sa-ws-port:,ors-host:,ors-activemq-port:,ors-ws-port:" "--" "$@")"
+
+if [ "$?" -ne 0 ]; then
+  usage
+  exit 1
+fi
+
+while true; do
+  case "$1" in
+    -h|--help) usage; exit 1; shift;;
+    -v|--verbose) verbose=1; shift;;
+    -o|--output) shift; output="${1}"; shift;;
+    -d|--destdir) shift; destdir="${1}"; shift;;
+    -r|--rundir) shift; rundir="${1}"; shift;;
+    -l|--logdir) shift; logdir="${1}"; shift;;
+    --sa-host) shift; sa_host="${1}"; shift;;
+    --sa-activemq-port) shift; sa_activemq_port="${1}"; shift;;
+    --sa-ws-port) shift; sa_ws_port="${1}"; shift;;
+    --ors-host) shift; ors_host="${1}"; shift;;
+    --ors-activemq-port) shift; ors_activem_port="${1}"; shift;;
+    --ors-ws-port) shift; ors_ws_port="${1}"; shift;;
+    --) shift; break;;
+  esac
+done
+
+if [ -z $destdir ]; then
+  echo "Missing option -d (--destdir)."
+  usage
+  exit 1
+fi
+
+mkdir -p $destdir
+destdir=$(absolute_path $destdir)
+output=${output:-$destdir/sa.conf}
+
+# File structures
+sadir=$destdir
+rundir=${rundir:-$sadir/run}
+logdir=${logdir:-$sadir/log}
+
+# From the viewpoint of ors itself
+ors_host=${ors_host:=localhost}
+ors_ws_host=$ors_host
+ors_ws_port=${ors_ws_port:=9002}
+ors_activemq_host=$ors_host
+ors_activemq_port=${ors_activemq_port:=61618}
+
+# From the viewpoint of strategyagent itself 
+sa_host=${sa_host:=localhost} 
+sa_ws_host=$sa_host
+sa_ws_port=${sa_ws_port:=9003}
+sa_activemq_host=$sa_host
+sa_activemq_port=${sa_activemq_port:=61619}
+
+echo "Confuration info:"
+echo "  destdir: $destdir"
+echo "  rundir: $rundir"
+echo "  logdir: $logdir"  
+echo "  sa-host: $sa_host"
+echo "  sa-ws-port: $sa_ws_port"
+echo "  sa-activemq-port: $sa_activemq_port"
+echo "  ors_host: $ors_host"
+echo "  ors_activemq_port: $ors_activemq_port"
+echo "  ors_ws_port: $ors_ws_port"
+
+metc_home=$BASEDIR
+mkdir -p $sadir
+mkdir -p $rundir
+mkdir -p $logdir
+cp -r $metc_home/strategyagent/{conf,modules} $destdir
+ln -sf $metc_home/lib $destdir
+
+# 2. Fix sa configuration using user.properties
+logdir_safe=$(echo $logdir | sed -e 's/\//\\\//g')
+eval "sed -i -e 's/^log4j.appender.file.File=.*$/log4j.appender.file.File=$logdir_safe\/strategyagent.log/' $sadir/conf/log4j.properties"
+
+cat > $sadir/conf/user.properties <<EOF
+metc.sa.ws.host=$sa_ws_host
+metc.sa.ws.port=$sa_ws_port
+metc.sa.recv.url=tcp://$sa_activemq_host:$sa_activemq_port
+
+metc.sa.client.URL=tcp://$ors_activemq_host:$ors_activemq_port
+metc.sa.client.hostname=$ors_ws_host
+metc.sa.client.port=$ors_ws_port
+
+EOF
+
+cat > $output << EOF
+METC_HOME=$metc_home
+SA_DIR=$sadir
+RUN_DIR=$rundir
+LOG_DIR=$logdir
+
+EOF
+

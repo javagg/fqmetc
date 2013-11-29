@@ -1,0 +1,27 @@
+#!/bin/bash -e
+
+
+BASE_DIR=$(cd "`dirname $0`" && pwd)
+SPEC_FILE="$BASE_DIR/metc.spec"
+BUILD_DIR="/tmp/`basename $BASE_DIR`_build"
+
+_name=`grep "^Name:" $SPEC_FILE | cut -d : -f 2 | tr -d ' '`
+
+[ -d "$BUILD_DIR" ] && rm -rf $BUILD_DIR
+mkdir -p $BUILD_DIR
+cp $SPEC_FILE $BUILD_DIR
+
+pushd $BASE_DIR > /dev/null
+  # Can't use `tito build --test --tgz` to generate tar ball because 
+  # `tito tag` failed on centos/rhel 6, we emulate by tarring it manully
+  tito build --test --tgz -o $BUILD_DIR
+popd > /dev/null
+
+SPEC_FILE="$BUILD_DIR/metc.spec"
+pushd $BUILD_DIR > /dev/null
+  outfile=`ls ${_name}-*.tar.gz`
+  commit=$(eval "echo $outfile | sed 's/^${_name}-//' | sed 's/\.tar\.gz$//' | tr - .")
+  eval "sed -i -e 's/^Release:\(.*\)%{?dist}$/Release:\1.${commit}%{?dist}/' $SPEC_FILE"
+  eval "sed -i -e 's/^Source0:.*$/Source0:${outfile}/' $SPEC_FILE"
+  rpmbuild -ba $SPEC_FILE -D "_sourcedir $BUILD_DIR"
+popd > /dev/null

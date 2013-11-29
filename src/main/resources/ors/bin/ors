@@ -1,0 +1,42 @@
+#!/bin/bash -e
+
+function usage() {
+  echo "usage: $(basename $0) -c|--config CONFIG" 1>&2
+}
+
+# Set default values
+CONFIG=
+
+# Parse arguments
+eval set -- "$(getopt -n "$0" -o "hvc:" -l "help,verbose,config:" "--" "$@")"
+if [ "$?" -ne 0 ]; then
+  usage
+  exit 1
+fi
+
+while true; do
+  case "$1" in
+    -h|--help) usage; exit 1; shift;;
+    -v|--verbose) verbose=1; shift;;
+    -c|--config) shift;CONFIG="${1}"; shift;;
+    --) shift; break;;
+  esac
+done
+
+if [ -z "$CONFIG" ]; then
+  echo "Missing option -c (--config)."
+  usage
+  exit 1
+fi
+
+source $CONFIG
+
+# Determine classpath needed to run apps
+CLASSPATH=$ORS_DIR/conf
+for jar in `ls -1 $METC_HOME/lib/*.jar`; do
+  CLASSPATH=$CLASSPATH:$jar
+done
+
+JAVA=`which java`
+exec $JAVA -Xms384m -Xmx600m -XX:MaxPermSize=512m -server -Dorg.marketcetera.appDir=$ORS_DIR -cp $CLASSPATH org.marketcetera.ors.OrderRoutingSystem $* 2>&1
+
