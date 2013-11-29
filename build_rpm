@@ -17,11 +17,16 @@ pushd $BASE_DIR > /dev/null
   tito build --test --tgz -o $BUILD_DIR
 popd > /dev/null
 
-SPEC_FILE="$BUILD_DIR/metc.spec"
+SPEC_FILE="$BUILD_DIR/$(basename $SPEC_FILE)"
 pushd $BUILD_DIR > /dev/null
   outfile=`ls ${_name}-*.tar.gz`
   commit=$(eval "echo $outfile | sed 's/^${_name}-//' | sed 's/\.tar\.gz$//' | tr - .")
   eval "sed -i -e 's/^Release:\(.*\)%{?dist}$/Release:\1.${commit}%{?dist}/' $SPEC_FILE"
   eval "sed -i -e 's/^Source0:.*$/Source0:${outfile}/' $SPEC_FILE"
+  
+  # remove .tar.gz
+  outfile="${outfile%.*}"
+  outfile="${outfile%.*}"
+  eval "sed -i -e 's/^%setup.*$/%setup -q -n ${outfile}/' $SPEC_FILE"
   rpmbuild -ba $SPEC_FILE -D "_sourcedir $BUILD_DIR"
 popd > /dev/null

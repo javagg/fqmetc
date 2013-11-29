@@ -20,6 +20,7 @@ Requires:      jpackage-utils
 BuildRequires: java-devel >= 1:1.7.0
 BuildRequires: jpackage-utils
 BuildRequires: javapackages-tools >= 0.7.0
+BuildRequires: maven
 
 BuildArch:     noarch
 
@@ -30,12 +31,17 @@ Marketcetera Automated Trading Platform
 %setup -q
 
 %build
-
+mvn package
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{homedir}
-cp -pa * %{buildroot}%{homedir}
+mkdir -p %{buildroot}%{homedir}/lib
+cp -pa target/classes/* %{buildroot}%{homedir}
+
+for jar in `find target/repo -name *.jar`; do
+  cp $jar %{buildroot}%{homedir}/lib
+done
 
 mkdir -p %{buildroot}/var/run/ors
 mkdir -p %{buildroot}/var/log/ors
