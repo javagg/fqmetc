@@ -1,6 +1,5 @@
 #!/bin/bash -e
 
-
 BASE_DIR=$(cd "`dirname $0`" && pwd)
 SPEC_FILE="$BASE_DIR/metc.spec"
 BUILD_DIR="/tmp/`basename $BASE_DIR`_build"
@@ -12,8 +11,6 @@ mkdir -p $BUILD_DIR
 cp $SPEC_FILE $BUILD_DIR
 
 pushd $BASE_DIR > /dev/null
-  # Can't use `tito build --test --tgz` to generate tar ball because 
-  # `tito tag` failed on centos/rhel 6, we emulate by tarring it manully
   tito build --test --tgz -o $BUILD_DIR
 popd > /dev/null
 

@@ -24,10 +24,43 @@ BuildRequires: maven
 BuildRequires: maven3
 %endif
 
+Requires:      %{name}-common = %{version}-%{release}
 BuildArch:     noarch
 
 %description
 Marketcetera Automated Trading Platform
+
+%package common
+Summary:       Common files for %{name}
+Group:         Applications/Internet
+Requires:      %{name}-common = %{version}-%{release}
+BuildArch:     noarch
+%description common
+This package contains the file shard between the subpackages of %{name}.
+
+%package ors
+Summary:       ORS server of %{name}
+Group:         Applications/Internet
+Requires:      %{name}-common = %{version}-%{release}
+BuildArch:     noarch
+%description ors
+This package contains the ORS server of %{name}
+
+%package strategyagent
+Summary:       Strategy Agent of %{name}
+Group:         Applications/Internet
+Requires:      %{name}-common = %{version}-%{release}
+BuildArch:     noarch
+%description strategyagent
+This package contains the strategy agent of %{name}
+
+%package orderloader
+Summary:       Order Loader of %{name}
+Group:         Applications/Internet
+Requires:      %{name}-common = %{version}-%{release}
+BuildArch:     noarch
+%description orderloader
+This package contains the order loader of %{name}
 
 %prep
 %setup -q
@@ -56,20 +89,36 @@ ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
 ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
 
-%post
+%post ors
 #%{_bindir}/ors_install_inst --destdir %{homedir}/default_inst --rundir %{rundir} --logdir %{logdir}
 
-%files
+%files common
+%attr(-,root,root)
+
+
+%{homedir}/lib
+%{homedir}/sql
+
+%files ors
 %attr(-,root,root)
 %{_bindir}/ors_install_inst
-%{_bindir}/sa_install_inst
 %{_bindir}/ors
 %{_bindir}/orsctl
+%{homedir}/ors
+%{homedir}/bin/ors_install_inst
+
+%files strategyagent
+%attr(-,root,root)
+%{_bindir}/sa_install_inst
 %{_bindir}/strategyagent
 %{_bindir}/sactl
-%{_bindir}/orderloader
+%{homedir}/strategyagent
+%{homedir}/bin/sa_install_inst
 
-%{homedir}
+%files orderloader
+%attr(-,root,root)
+%{_bindir}/orderloader
+%{homedir}/orderloader
 
 %changelog
 * Mon Aug 05 2013 Alex Lee <lu.lee05@gmail.com> 2.2.0-1
