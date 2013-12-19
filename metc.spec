@@ -78,6 +78,8 @@ mvn package
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{homedir}/lib
 cp -pa target/classes/* %{buildroot}%{homedir}
+# The ors-${version}.jar in this folder is not what we need
+rm -rf target/repo/net/freequant
 
 for jar in `find target/repo -name *.jar`; do
   cp $jar %{buildroot}%{homedir}/lib
@@ -90,6 +92,7 @@ ln -s %{homedir}/bin/ors_install_inst %{buildroot}%{_bindir}
 ln -s %{homedir}/bin/sa_install_inst %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/orsctl %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/ors %{buildroot}%{_bindir}
+ln -s %{homedir}/ors/bin/ors2 %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
 ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
@@ -131,6 +134,7 @@ fi
 %attr(-,root,root)
 %{_bindir}/ors_install_inst
 %{_bindir}/ors
+%{_bindir}/ors2
 %{_bindir}/orsctl
 %{homedir}/ors
 %{homedir}/bin/ors_install_inst

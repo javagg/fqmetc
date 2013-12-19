@@ -5,8 +5,9 @@ After=syslog.target network.target
 [Service]
 Type=forking
 EnviromentFile=/etc/marketcetera/ors.conf
-ExecStart=/usr/sbin/tomcat-sysd start
-ExecStop=/usr/sbin/tomcat-sysd stop
+ExecStart=/usr/bin/orsctl2 start
+ExecStop=/usr/bin/orsctl2 stop
+PIDFile=/var/run/marketcetera/ors.pid
 User=ors
 Group=ors
 

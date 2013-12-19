@@ -1,0 +1,28 @@
+#!/bin/sh
+
+CONFIG=${CONFIG:-/etc/marketcetera/ors.conf}
+[ -r $CONFIG ] && . $CONFIG
+
+# Determine classpath needed to run apps
+CLASSPATH="${ORS_DIR}/conf"
+for jar in `find "${METC_HOME}/lib" -name *.jar`; do
+  CLASSPATH=$CLASSPATH:$jar
+done
+
+CMD=`which java`
+cat > $USER_PROPERTIES_FILE << EOF
+metc.ws.host=${WS_HOST}
+metc.ws.port=${WS_PORT}
+metc.jms.broker.url=tcp://\${metc.ws.host}:${ACTIVEMQ_PORT}?wireFormat.maxInactivityDurationInitalDelay=30000
+metc.jdbc.user=${DB_USER}
+metc.jdbc.password=${DB_PASS}
+metc.jdbc.url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?logSlowQueries=true&$query
+EOF
+
+cd ${ORS_DIR}
+CMD="$CMD -classpath $CLASSPATH"
+# This argument have to be set before main class
+CMD="$CMD -Dorg.marketcetera.appDir=${ORS_DIR}"
+CMD="$CMD org.marketcetera.ors.OrderRoutingSystem"
+exec $CMD $@
+
