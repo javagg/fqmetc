@@ -1,0 +1,14 @@
+[Unit]
+Description=Marketcetera ORS server
+After=syslog.target network.target
+
+[Service]
+Type=forking
+EnviromentFile=/etc/marketcetera/ors.conf
+ExecStart=/usr/sbin/tomcat-sysd start
+ExecStop=/usr/sbin/tomcat-sysd stop
+User=ors
+Group=ors
+
+[Install]
+WantedBy=multi-user.target

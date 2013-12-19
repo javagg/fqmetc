@@ -1,6 +1,7 @@
 #!/bin/sh
 
-[ -z "$DB_URL" ] && echo "Warning: Please set DB_URL!"
+DB_URL=${DB_URL:-"mysql://marketcetera:marketcetera@localhost:3306/marketcetera"}
+
 # extract the protocol
 proto=`echo $DB_URL | grep '://' | sed -e 's,^\(.*://\).*,\1,g'`
 
@@ -60,7 +61,8 @@ CMD=`which java`
 # Get from heroku
 PORT=${PORT:-61618}
 
-cat > "$BASEDIR/classes/conf/user.properties" << EOF
+USER_PROPERTIES_FILE=${USER_PROPERTIES_FILE:-"$BASEDIR/classes/conf/user.properties"}
+cat > $USER_PROPERTIES_FILE << EOF
 metc.ws.host=localhost
 metc.ws.port=9009
 metc.jms.broker.url=tcp://\${metc.ws.host}:$PORT?wireFormat.maxInactivityDurationInitalDelay=30000

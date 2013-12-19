@@ -5,6 +5,12 @@
 %global logdir    %{_localstatedir}/log/%{name}
 %global rundir    %{_localstatedir}/run/%{name}
 
+%if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
+  %global with_systemd 1
+%else
+  %global with_systemd 0
+%endif
+
 Summary:       Marketcetera Automated Trading Platform
 Name:          marketcetera
 Version:       2.2.0
@@ -70,7 +76,6 @@ mvn package
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{homedir}
 mkdir -p %{buildroot}%{homedir}/lib
 cp -pa target/classes/* %{buildroot}%{homedir}
 
@@ -89,12 +94,35 @@ ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
 ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
 
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}
+install -D -p -m 644 ors.conf %{buildroot}%{_sysconfdir}/%{name}
+%if %{with_systemd}
+mkdir -p %{buildroot}%{_unitdir}
+install -D -p -m 644 ors.service %{buildroot}%{_unitdir}
+%else
+mkdir -p %{buildroot}%{_initddir}
+install -D -p -m 755 ors.init %{buildroot}%{_initddir}/ors
+%endif
+#install -D -p -m 644 ors.logrotate.d %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+
 %post ors
-#%{_bindir}/ors_install_inst --destdir %{homedir}/default_inst --rundir %{rundir} --logdir %{logdir}
+%if %{with_systemd}
+  /bin/systemctl --system daemon-reload
+%else
+  /sbin/chkconfig --add ors || :
+%endif
+
+%preun ors
+if [ "$1" -eq "0" ]; then
+%if %{with_systemd}
+  /bin/systemctl --no-reload disable ors.service
+%else
+  /sbin/chkconfig --del ors || :
+%endif
+fi
 
 %files common
 %attr(-,root,root)
-
 
 %{homedir}/lib
 %{homedir}/sql
@@ -106,6 +134,13 @@ ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
 %{_bindir}/orsctl
 %{homedir}/ors
 %{homedir}/bin/ors_install_inst
+%attr(0644,-,-) %{_sysconfdir}/%{name}/ors.conf
+%if %{with_systemd}
+%attr(0644,-,-) %{_unitdir}/ors.service
+%else
+%attr(0755,-,-) %{_initddir}/ors
+%endif
+#%attr(0644,-,-) %{_sysconfdir}/logrotate.d/ors
 
 %files strategyagent
 %attr(-,root,root)
