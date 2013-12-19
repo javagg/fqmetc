@@ -4,9 +4,6 @@ function usage() {
   echo "usage: $(basename $0) [-c|--config CONFIG] [-w|--workdir WORKDIR] CMDFILE" 1>&2
 }
 
-# Set default values
-CONFIG=
-
 # Parse arguments
 eval set -- "$(getopt -n "$0" -o "hvc:w:" -l "help,verbose,config:,workdir:" "--" "$@")"
 if [ "$?" -ne 0 ]; then
@@ -30,21 +27,38 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-if [ -z "$CONFIG" ]; then
-  echo "Missing option -c|--config"
-  usage
-  exit 1
+CONFIG=${CONFIG:-/etc/marketcetera/strategyagent.conf}
+[ -r "$CONFIG" ] && . $CONFIG
+
+METC_HOME="${METC_HOME:-/usr/share/marketcetera}"
+SA_DIR="${SA_DIR:-$HOME/.strategyagent}"
+if [ ! -f "$SA_DIR" ]; then
+  mkdir -p $SA_DIR
+  cp -r $METC_HOME/strategyagent/{conf,modules} $SA_DIR
 fi
 
-source $CONFIG
-
 # Determine classpath needed to run apps
-CLASSPATH=$SA_DIR/conf
+CLASSPATH="${SA_DIR}/conf"
 for jar in `ls -1 $METC_HOME/lib/*.jar`; do
   CLASSPATH=$CLASSPATH:$jar
 done
 
+USER_PROPERTIES_FILE="${SA_DIR}/conf/user.properties"
+ACTIVEMQ_PORT=${ACTIVEMQ_PORT:-61619}
+ORS_HOST=${ORS_HOST:-localhost}
+ORS_ACTIVEMQ_PORT=${ORS_ACTIVEMQ_PORT:-61618}
+ORS_WS_PORT=${ORS_WS_PORT:-9000}
+echo $ORS_HOST
+echo $ORS_PORT
+
+cat > $USER_PROPERTIES_FILE << EOF
+metc.sa.ws.host=localhost
+metc.sa.ws.port=9001
+metc.sa.recv.url=tcp://${ORS_HOST}:${ORS_WS_PORT}
+metc.sa.client.url=tcp://${ORS_HOST}:${ORS_ACTIVEMQ_PORT}
+EOF
+
 WORKDIR=${WORKDIR:-`pwd`}
 cd $WORKDIR
 JAVA=`which java`
-exec $JAVA -Xms384m -Xmx600m -XX:MaxPermSize=512m -server -Dorg.marketcetera.appDir=$SA_DIR -cp $CLASSPATH org.marketcetera.strategyagent.StrategyAgent $* 2>&1
+exec $JAVA -Xms384m -Xmx600m -XX:MaxPermSize=512m -server -Dorg.marketcetera.appDir=${SA_DIR} -cp $CLASSPATH org.marketcetera.strategyagent.StrategyAgent $* 2>&1

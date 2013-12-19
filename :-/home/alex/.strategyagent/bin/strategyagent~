@@ -1,0 +1,44 @@
+#!/bin/bash -e
+
+function usage() {
+  echo "usage: $(basename $0) [-c|--config CONFIG] CMDFILE" 1>&2
+}
+
+# Set default values
+CONFIG=
+
+# Parse arguments
+eval set -- "$(getopt -n "$0" -o "hvc:w:" -l "help,verbose,config:,workdir:" "--" "$@")"
+if [ "$?" -ne 0 ]; then
+  usage
+  exit 1
+fi
+
+for o; do
+  case "$o" in
+    -h|--help) usage; shift;;
+    -v|--verbose) verbose=1; shift;;
+    -c|--config) shift;CONFIG="${1}"; shift;;
+    -w|--workdir) shift;WORKDIR="${1}"; shift;;
+    --) shift; break;;
+  esac
+done
+
+if [ -z "$CONFIG" ]; then
+  echo "Missing option -c|--config"
+  usage
+  exit 1
+fi
+
+source $CONFIG
+
+[ -z "$WORKDIR" ] && WORKDIR=`pwd`
+
+# Determine classpath needed to run apps
+CLASSPATH=$SA_DIR/conf
+for jar in `ls -1 $METC_HOME/lib/*.jar`; do
+  CLASSPATH=$CLASSPATH:$jar
+done
+
+cd $WORKDIR
+java -Xms384m -Xmx600m -XX:MaxPermSize=512m -server -Dorg.marketcetera.appDir=$SA_DIR -cp $CLASSPATH org.marketcetera.strategyagent.StrategyAgent $*
