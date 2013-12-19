@@ -83,6 +83,8 @@ cp -pa target/classes/* %{buildroot}%{homedir}
 # The ors-${version}.jar in this folder is not what we need
 rm -rf target/repo/net/freequant
 
+rm %{buildroot}%{homedir}/bin/ors_install_inst
+
 for jar in `find target/repo -name *.jar`; do
   cp $jar %{buildroot}%{homedir}/lib
 done
@@ -93,11 +95,9 @@ mkdir -p %{buildroot}/var/log/ors
 mkdir -p %{buildroot}/var/run/strategyagent
 mkdir -p %{buildroot}/var/log/strategyagent
 
-ln -s %{homedir}/bin/ors_install_inst %{buildroot}%{_bindir}
 ln -s %{homedir}/bin/sa_install_inst %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/orsctl %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/ors %{buildroot}%{_bindir}
-ln -s %{homedir}/ors/bin/ors2 %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/strategyagent2 %{buildroot}%{_bindir}
@@ -111,7 +111,7 @@ mkdir -p %{buildroot}%{_unitdir}
 install -D -p -m 644 ors.service %{buildroot}%{_unitdir}
 %else
 mkdir -p %{buildroot}%{_initddir}
-install -D -p -m 755 ors.init %{buildroot}%{_initddir}/ors
+install -D -p -m 755 %{buildroot}%{homedir}/ors/bin/orsctl %{buildroot}%{_initddir}/ors
 %endif
 
 # Fix ors log4j configuration inplace
@@ -143,13 +143,10 @@ fi
 
 %files ors
 %attr(-,root,root)
-%{_bindir}/ors_install_inst
 %attr(0755,-,-) %{_bindir}/ors
-%attr(0755,-,-) %{_bindir}/ors2
 %attr(0755,-,-) %{_bindir}/orsctl
 %attr(0755,-,-) %{homedir}/ors/bin/*
 %{homedir}/ors
-%attr(0755,-,-) %{homedir}/bin/ors_install_inst
 /var/run/ors
 /var/log/ors
 

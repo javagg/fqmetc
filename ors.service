@@ -3,10 +3,11 @@ Description=Marketcetera ORS server
 After=syslog.target network.target
 
 [Service]
-ExecStart=/usr/bin/ors2 >/dev/null 2>&1
-ExecStop=/bin/kill -TERM $MAINPID
-User=ors
-Group=ors
+Type=forking
+ExecStart=/usr/bin/orsctl start
+ExecStop=/usr/bin/orsctl stop
+PIDFile=/var/run/ors/ors.pid
 
 [Install]
 WantedBy=multi-user.target
+

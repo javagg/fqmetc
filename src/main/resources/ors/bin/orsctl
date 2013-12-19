@@ -1,35 +1,11 @@
-#!/bin/bash
+#!/bin/sh
+# Startup script for the ORS Server
+# chkconfig: - 85 15
+# pidfile: /var/run/ors/ors.pid
+# main config: /etc/marketcetera/ors.conf
 
-function usage() {
-  echo "usage: $(basename $0) [-c|--config CONFIG] [-v|--verbose] [-h|--help] {start|stop|status|restart}" 1>&2
-}
-
-# Set default values
-CONFIG=
-
-# Parse arguments
-eval set -- "$(getopt -n "$0" -o "hvc:" -l "help,verbose,config:" "--" "$@")"
-if [ "$?" -ne 0 ]; then
-  usage
-  exit 1
-fi
-
-for o; do
-  case "$o" in
-    -h|--help) usage; exit 1; shift;;
-    -v|--verbose) verbose=1; shift;;
-    -c|--config) shift;CONFIG="${1}"; shift;;
-    --) shift; break;;
-  esac
-done
-
-# Check which command to execute
-if [ "$#" -ne 1 ]; then
-  usage
-  exit 2
-fi
-
-source $CONFIG
+CONFIG="/etc/marketcetera/ors.conf"
+[ -r $CONFIG ] && . $CONFIG
 
 PIDFILE=$RUN_DIR/ors.pid
 
@@ -78,7 +54,8 @@ killtree() {
 function start() {
   echo "Starting ORS"
   if ! isrunning; then
-    /usr/bin/ors --config $CONFIG >/dev/null 2>&1 &
+    mkdir -p $RUN_DIR
+    /usr/bin/ors >/dev/null 2>&1 &
     local pid=$!
     echo $pid > $PIDFILE
     echo "Started ORS"
@@ -116,10 +93,15 @@ function status() {
   fi
 }
 
+function usage() {
+   echo "Usage: $0 {start|stop|restart|status}"
+}
+
+# See how we were called.
 case "$1" in
-  start)     start ;;
-  stop)      stop ;;
-  restart)   restart ;;
-  status)    status ;;
-  *)         usage
+  start) start ;;
+  stop) stop ;;
+  restart) restart ;;
+  status) status ;;
+  *) usage ;;
 esac
