@@ -54,6 +54,7 @@ killtree() {
 function start() {
   echo "Starting ORS"
   if ! isrunning; then
+    mkdir -p $RUN_DIR
     /usr/bin/ors2 >/dev/null 2>&1 &
     local pid=$!
     echo $pid > $PIDFILE

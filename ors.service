@@ -3,11 +3,8 @@ Description=Marketcetera ORS server
 After=syslog.target network.target
 
 [Service]
-Type=forking
-EnviromentFile=/etc/marketcetera/ors.conf
-ExecStart=/usr/bin/orsctl2 start
-ExecStop=/usr/bin/orsctl2 stop
-PIDFile=/var/run/marketcetera/ors.pid
+ExecStart=/usr/bin/ors2 >/dev/null 2>&1
+ExecStop=/bin/kill -TERM $MAINPID
 User=ors
 Group=ors
 
