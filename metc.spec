@@ -100,6 +100,8 @@ ln -s %{homedir}/ors/bin/ors %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/ors2 %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
+ln -s %{homedir}/strategyagent/bin/strategyagent2 %{buildroot}%{_bindir}
+ln -s %{homedir}/strategyagent/bin/sactl2 %{buildroot}%{_bindir}
 ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
@@ -111,6 +113,10 @@ install -D -p -m 644 ors.service %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_initddir}
 install -D -p -m 755 ors.init %{buildroot}%{_initddir}/ors
 %endif
+
+# Fix ors log4j configuration inplace
+sed -i -e 's/^log4j.appender.file.File=.*$/log4j.appender.file.File=\/var\/log\/ors\/ors.log/' %{buildroot}%{homedir}/ors/conf/log4j/server.properties
+
 #install -D -p -m 644 ors.logrotate.d %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 %post ors
@@ -143,7 +149,7 @@ fi
 %attr(0755,-,-) %{_bindir}/orsctl
 %attr(0755,-,-) %{homedir}/ors/bin/*
 %{homedir}/ors
-%{homedir}/bin/ors_install_inst
+%attr(0755,-,-) %{homedir}/bin/ors_install_inst
 /var/run/ors
 /var/log/ors
 
@@ -159,10 +165,12 @@ fi
 %attr(-,root,root)
 %attr(0755,-,-) %{_bindir}/sa_install_inst
 %attr(0755,-,-) %{_bindir}/strategyagent
+%attr(0755,-,-) %{_bindir}/strategyagent2
 %attr(0755,-,-) %{_bindir}/sactl
+%attr(0755,-,-) %{_bindir}/sactl2
 %attr(0755,-,-) %{homedir}/strategyagent/bin/*
 %{homedir}/strategyagent
-%{homedir}/bin/sa_install_inst
+%attr(0755,-,-) %{homedir}/bin/sa_install_inst
 /var/run/strategyagent
 /var/log/strategyagent
 

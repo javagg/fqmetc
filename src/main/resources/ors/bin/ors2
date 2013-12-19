@@ -9,7 +9,6 @@ for jar in `find "${METC_HOME}/lib" -name *.jar`; do
   CLASSPATH=$CLASSPATH:$jar
 done
 
-CMD=`which java`
 cat > $USER_PROPERTIES_FILE << EOF
 metc.ws.host=${WS_HOST}
 metc.ws.port=${WS_PORT}
@@ -20,6 +19,7 @@ metc.jdbc.url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?logSlowQueries=true&
 EOF
 
 cd ${ORS_DIR}
+CMD=`which java`
 CMD="$CMD -classpath $CLASSPATH"
 # This argument have to be set before main class
 CMD="$CMD -Dorg.marketcetera.appDir=${ORS_DIR}"

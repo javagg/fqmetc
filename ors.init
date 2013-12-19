@@ -1,4 +1,8 @@
 #!/bin/sh
+# Startup script for the ORS Server
+# chkconfig: - 85 15
+# pidfile: /var/run/ors/ors.pid
+# main config: /etc/marketcetera/ors.conf
 
 CONFIG="/etc/marketcetera/ors.conf"
 [ -r $CONFIG ] && . $CONFIG
