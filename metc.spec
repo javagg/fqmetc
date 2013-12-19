@@ -139,6 +139,7 @@ fi
 %attr(0755,-,-) %{_bindir}/ors
 %attr(0755,-,-) %{_bindir}/ors2
 %attr(0755,-,-) %{_bindir}/orsctl
+%attr(0755,-,-) %{homedir}/ors/bin/*
 %{homedir}/ors
 %{homedir}/bin/ors_install_inst
 /var/run/ors
@@ -157,6 +158,7 @@ fi
 %attr(0755,-,-) %{_bindir}/sa_install_inst
 %attr(0755,-,-) %{_bindir}/strategyagent
 %attr(0755,-,-) %{_bindir}/sactl
+%attr(0755,-,-) %{homedir}/strategyagent/bin/*
 %{homedir}/strategyagent
 %{homedir}/bin/sa_install_inst
 /var/run/strategyagent
