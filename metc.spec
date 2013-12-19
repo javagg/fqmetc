@@ -75,6 +75,8 @@ This package contains the order loader of %{name}
 mvn package
 
 %install
+#sed -i -e '/<value>stomp:\/\/${metc.ws.host}:61613<\/value>/d' $orsdir/conf/messaging/broker.xml
+
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{homedir}/lib
 cp -pa target/classes/* %{buildroot}%{homedir}
