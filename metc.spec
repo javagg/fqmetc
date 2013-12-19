@@ -88,6 +88,9 @@ done
 mkdir -p %{buildroot}/var/run/ors
 mkdir -p %{buildroot}/var/log/ors
 
+mkdir -p %{buildroot}/var/run/strategyagent
+mkdir -p %{buildroot}/var/log/strategyagent
+
 ln -s %{homedir}/bin/ors_install_inst %{buildroot}%{_bindir}
 ln -s %{homedir}/bin/sa_install_inst %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/orsctl %{buildroot}%{_bindir}
@@ -133,11 +136,14 @@ fi
 %files ors
 %attr(-,root,root)
 %{_bindir}/ors_install_inst
-%{_bindir}/ors
-%{_bindir}/ors2
-%{_bindir}/orsctl
+%attr(0755,-,-) %{_bindir}/ors
+%attr(0755,-,-) %{_bindir}/ors2
+%attr(0755,-,-) %{_bindir}/orsctl
 %{homedir}/ors
 %{homedir}/bin/ors_install_inst
+/var/run/ors
+/var/log/ors
+
 %attr(0644,-,-) %{_sysconfdir}/%{name}/ors.conf
 %if %{with_systemd}
 %attr(0644,-,-) %{_unitdir}/ors.service
@@ -148,15 +154,17 @@ fi
 
 %files strategyagent
 %attr(-,root,root)
-%{_bindir}/sa_install_inst
-%{_bindir}/strategyagent
-%{_bindir}/sactl
+%attr(0755,-,-) %{_bindir}/sa_install_inst
+%attr(0755,-,-) %{_bindir}/strategyagent
+%attr(0755,-,-) %{_bindir}/sactl
 %{homedir}/strategyagent
 %{homedir}/bin/sa_install_inst
+/var/run/strategyagent
+/var/log/strategyagent
 
 %files orderloader
 %attr(-,root,root)
-%{_bindir}/orderloader
+%attr(0755,-,-) %{_bindir}/orderloader
 %{homedir}/orderloader
 
 %changelog
