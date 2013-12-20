@@ -105,7 +105,7 @@ ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
 
 # link strategy modules dir to lib
 pushd %{buildroot}%{homedir}/strategyagent/modules
-ln -s %{homedir}/strategyagent/modules/lib jars
+ln -s %{homedir}/lib jars
 popd
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
