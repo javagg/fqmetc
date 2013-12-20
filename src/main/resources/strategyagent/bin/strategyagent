@@ -37,6 +37,8 @@ if [ ! -f "$SA_DIR" ]; then
   cp -r $METC_HOME/strategyagent/{conf,modules} $SA_DIR
 fi
 
+[ -r "$HOME/.strategyagent/strategyagent.conf" ] && . "$HOME/.strategyagent/strategyagent.conf"
+
 # Determine classpath needed to run apps
 CLASSPATH="${SA_DIR}/conf"
 for jar in `ls -1 $METC_HOME/lib/*.jar`; do
@@ -44,18 +46,20 @@ for jar in `ls -1 $METC_HOME/lib/*.jar`; do
 done
 
 USER_PROPERTIES_FILE="${SA_DIR}/conf/user.properties"
+BIND_IP=${BIND_IP:-localhost}
 ACTIVEMQ_PORT=${ACTIVEMQ_PORT:-61619}
+WS_PORT=${WS_PORT:-9001}
 ORS_HOST=${ORS_HOST:-localhost}
 ORS_ACTIVEMQ_PORT=${ORS_ACTIVEMQ_PORT:-61618}
 ORS_WS_PORT=${ORS_WS_PORT:-9000}
-echo $ORS_HOST
-echo $ORS_PORT
 
 cat > $USER_PROPERTIES_FILE << EOF
-metc.sa.ws.host=localhost
-metc.sa.ws.port=9001
-metc.sa.recv.url=tcp://${ORS_HOST}:${ORS_WS_PORT}
-metc.sa.client.url=tcp://${ORS_HOST}:${ORS_ACTIVEMQ_PORT}
+metc.sa.ws.host=${BIND_IP}
+metc.sa.ws.port=${WS_PORT}
+metc.sa.recv.url=tcp://${BIND_IP}:${ACTIVEMQ_PORT}
+metc.sa.client.URL=tcp://${ORS_HOST}:${ORS_ACTIVEMQ_PORT}
+metc.sa.client.hostname=${ORS_HOST}
+metc.sa.client.port=${ORS_WS_PORT}
 EOF
 
 WORKDIR=${WORKDIR:-`pwd`}

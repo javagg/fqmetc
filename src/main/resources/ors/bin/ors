@@ -10,9 +10,9 @@ for jar in `find "${METC_HOME}/lib" -name *.jar`; do
 done
 
 cat > $USER_PROPERTIES_FILE << EOF
-metc.ws.host=${WS_HOST}
+metc.ws.host=${BIND_IP}
 metc.ws.port=${WS_PORT}
-metc.jms.broker.url=tcp://\${metc.ws.host}:${ACTIVEMQ_PORT}?wireFormat.maxInactivityDurationInitalDelay=30000
+metc.jms.broker.url=tcp://${BIND_IP}:${ACTIVEMQ_PORT}?wireFormat.maxInactivityDurationInitalDelay=30000
 metc.jdbc.user=${DB_USER}
 metc.jdbc.password=${DB_PASS}
 metc.jdbc.url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?logSlowQueries=true&$query

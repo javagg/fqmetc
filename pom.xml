@@ -5,10 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.freequant</groupId>
-    <artifactId>ors</artifactId>
+    <artifactId>metc</artifactId>
     <version>2.2.0</version>
 
     <dependencies>
+        <dependency>
+            <groupId>org.marketcetera</groupId>
+            <artifactId>client</artifactId>
+            <version>2.2.0</version>
+        </dependency>
         <dependency>
             <groupId>org.marketcetera</groupId>
             <artifactId>ors</artifactId>
@@ -21,7 +26,17 @@
         </dependency>
         <dependency>
             <groupId>org.marketcetera</groupId>
+            <artifactId>orderloader</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marketcetera</groupId>
             <artifactId>marketdata-yahoo</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marketcetera</groupId>
+            <artifactId>marketdata-bogus</artifactId>
             <version>2.2.0</version>
         </dependency>
         <dependency>
@@ -36,8 +51,43 @@
         </dependency>
         <dependency>
             <groupId>org.marketcetera</groupId>
+            <artifactId>remote-receiver</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marketcetera</groupId>
+            <artifactId>remote-emitter</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.marketcetera</groupId>
             <artifactId>orderloader</artifactId>
             <version>2.2.0</version>
+        </dependency>
+        <dependency>
+	    <groupId>org.marketcetera</groupId>
+	    <artifactId>strategy</artifactId>
+	    <version>2.2.0</version>
+        </dependency>
+        <dependency>
+	    <groupId>org.marketcetera</groupId>
+	    <artifactId>saclient</artifactId>
+	    <version>2.2.0</version>
+        </dependency>
+        <dependency>
+	    <groupId>org.marketcetera</groupId>
+	    <artifactId>cep-system</artifactId>
+	    <version>2.2.0</version>
+        </dependency>
+        <dependency>
+	    <groupId>org.marketcetera</groupId>
+	    <artifactId>misc</artifactId>
+	    <version>2.2.0</version>
+        </dependency>
+        <dependency>
+	    <groupId>org.marketcetera</groupId>
+	    <artifactId>cep-esper</artifactId>
+	    <version>2.2.0</version>
         </dependency>
     </dependencies>
     <build>
