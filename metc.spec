@@ -88,10 +88,6 @@ rm %{buildroot}%{homedir}/bin/ors_install_inst
 for jar in `find target/repo -name *.jar`; do
   cp $jar %{buildroot}%{homedir}/lib
 done
-# link strategy modules dir to lib
-pushd %{buildroot}%{homedir}/strategyagent/modules
-ln -s ../../lib jars
-popd
 
 mkdir -p %{buildroot}/var/run/ors
 mkdir -p %{buildroot}/var/log/ors
@@ -106,6 +102,11 @@ ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl2 %{buildroot}%{_bindir}
 ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
+
+# link strategy modules dir to lib
+pushd %{buildroot}%{homedir}/strategyagent/modules
+ln -s %{homedir}/strategyagent/modules/lib jars
+popd
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 install -D -p -m 644 ors.conf %{buildroot}%{_sysconfdir}/%{name}

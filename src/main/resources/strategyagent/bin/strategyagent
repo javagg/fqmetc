@@ -32,7 +32,7 @@ CONFIG=${CONFIG:-/etc/marketcetera/strategyagent.conf}
 
 METC_HOME="${METC_HOME:-/usr/share/marketcetera}"
 SA_DIR="${SA_DIR:-$HOME/.strategyagent}"
-if [ ! -f "$SA_DIR" ]; then
+if [ ! -d "${SA_DIR}" ]; then
   mkdir -p $SA_DIR
   cp -r $METC_HOME/strategyagent/{conf,modules} $SA_DIR
 fi
