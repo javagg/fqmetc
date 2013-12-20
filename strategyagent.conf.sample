@@ -1,0 +1,10 @@
+# Optional
+#WORK_DIR=
+#ORS_HOST=localhost
+#SA_DIR=~/.strategyagent
+#RUN_DIR=
+#LOG_DIR=
+
+# Require Paramters, can be override by cmd options
+# works only for sactl, relative to WORK_DIR
+CMDFILE=samples/cmdfile.txt

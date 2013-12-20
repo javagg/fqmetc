@@ -118,9 +118,6 @@ mkdir -p %{buildroot}%{_initddir}
 install -D -p -m 755 %{buildroot}%{homedir}/ors/bin/orsctl %{buildroot}%{_initddir}/ors
 %endif
 
-# Fix ors log4j configuration inplace
-sed -i -e 's/^log4j.appender.file.File=.*$/log4j.appender.file.File=\/var\/log\/ors\/ors.log/' %{buildroot}%{homedir}/ors/conf/log4j/server.properties
-
 #install -D -p -m 644 ors.logrotate.d %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 %post ors

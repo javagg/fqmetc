@@ -3,11 +3,31 @@
 CONFIG=${CONFIG:-/etc/marketcetera/ors.conf}
 [ -r $CONFIG ] && . $CONFIG
 
+ORS_DIR="${METC_HOME}/ors"
+USER_PROPERTIES_FILE="${ORS_DIR}/conf/user.properties"
+
+LOG_DIR="${LOG_DIR:-${ORS_DIR}/log}"
+RUN_DIR="${RUN_DIR:-${ORS_DIR}/run}"
+
 # Determine classpath needed to run apps
 CLASSPATH="${ORS_DIR}/conf"
 for jar in `find "${METC_HOME}/lib" -name *.jar`; do
   CLASSPATH=$CLASSPATH:$jar
 done
+
+DB_HOST=${DB_HOST:-localhost}
+DB_PORT=${DB_PORT:-3306}
+DB_USER=${DB_USER:-marketcetera}
+DB_PASS=${DB_USER:-marketcetera}
+DB_NAME=${DB_USER:-marketcetera}
+BIND_IP=${BIND_IP:-localhost}
+ACTIVEMQ_PORT=${ACTIVEMQ_PORT:-61618}
+WS_PORT=${WS_PORT:9000}
+
+# Fix ors log4j configuration inplace
+# $orsdir may contain '/' which needs to encode first
+logdir_safe=$(echo $LOG_DIR | sed -e 's/\//\\\//g')
+eval "sed -i -e 's/^log4j.appender.file.File=.*$/log4j.appender.file.File=$logdir_safe\/ors.log/' ${ORS_DIR}/conf/log4j/server.properties"
 
 cat > $USER_PROPERTIES_FILE << EOF
 metc.ws.host=${BIND_IP}
@@ -18,6 +38,9 @@ metc.jdbc.password=${DB_PASS}
 metc.jdbc.url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?logSlowQueries=true&$query
 metc.broker.qf.store=${RUN_DIR}/broker/qf_store
 EOF
+
+mkdir -p $LOG_DIR
+mkdir -p $RUN_DIR
 
 cd ${ORS_DIR}
 CMD=`which java`

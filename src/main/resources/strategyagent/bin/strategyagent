@@ -16,7 +16,7 @@ while true; do
     -h|--help) usage; exit 1; shift;;
     -v|--verbose) verbose=1; shift;;
     -c|--config) shift; CONFIG="${1}"; shift;;
-    -w|--workdir) shift; WORKDIR="${1}"; shift;;
+    -w|--workdir) shift; WORK_DIR="${1}"; shift;;
     --) shift; break;;
   esac
 done
@@ -27,17 +27,21 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-CONFIG=${CONFIG:-/etc/marketcetera/strategyagent.conf}
+METC_HOME=/usr/share/marketcetera
+CONFIG="${CONFIG:-$HOME/strategyagent.conf}"
 [ -r "$CONFIG" ] && . $CONFIG
 
-METC_HOME="${METC_HOME:-/usr/share/marketcetera}"
-SA_DIR="${SA_DIR:-$HOME/.strategyagent}"
+SA_DIR="${SA_DIR:-${HOME}/.strategyagent}"
 if [ ! -d "${SA_DIR}" ]; then
   mkdir -p $SA_DIR
   cp -r $METC_HOME/strategyagent/{conf,modules} $SA_DIR
 fi
 
-[ -r "$HOME/.strategyagent/strategyagent.conf" ] && . "$HOME/.strategyagent/strategyagent.conf"
+RUN_DIR="${RUN_DIR:-${SA_DIR}/run}"
+LOG_DIR="${LOG_DIR:-${SA_DIR}/log}"
+# Fix sa log4j configuration. $sa_dir may contain '/' which needs to encode
+logdir_safe=$(echo $LOG_DIR | sed -e 's/\//\\\//g')
+eval "sed -i -e 's/^log4j.appender.file.File=.*$/log4j.appender.file.File=$logdir_safe\/strategyagent.log/' ${SA_DIR}/conf/log4j.properties"
 
 # Determine classpath needed to run apps
 CLASSPATH="${SA_DIR}/conf"
@@ -49,6 +53,7 @@ USER_PROPERTIES_FILE="${SA_DIR}/conf/user.properties"
 BIND_IP=${BIND_IP:-localhost}
 ACTIVEMQ_PORT=${ACTIVEMQ_PORT:-61619}
 WS_PORT=${WS_PORT:-9001}
+#FIXME: ORS_HOST need ip, not fqdn. WHY???
 ORS_HOST=${ORS_HOST:-localhost}
 ORS_ACTIVEMQ_PORT=${ORS_ACTIVEMQ_PORT:-61618}
 ORS_WS_PORT=${ORS_WS_PORT:-9000}
@@ -62,7 +67,7 @@ metc.sa.client.hostname=${ORS_HOST}
 metc.sa.client.port=${ORS_WS_PORT}
 EOF
 
-WORKDIR=${WORKDIR:-`pwd`}
-cd $WORKDIR
+WORK_DIR=${WORK_DIR:-`pwd`}
+cd $WORK_DIR
 JAVA=`which java`
 exec $JAVA -Xms384m -Xmx600m -XX:MaxPermSize=512m -server -Dorg.marketcetera.appDir=${SA_DIR} -cp $CLASSPATH org.marketcetera.strategyagent.StrategyAgent $* 2>&1

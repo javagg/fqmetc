@@ -7,6 +7,8 @@
 CONFIG="/etc/marketcetera/ors.conf"
 [ -r $CONFIG ] && . $CONFIG
 
+ORS_DIR="${METC_HOME}/ors"
+RUN_DIR="${RUN_DIR:-${ORS_DIR}/run}"
 PIDFILE=$RUN_DIR/ors.pid
 
 function isrunning() {
@@ -54,7 +56,6 @@ killtree() {
 function start() {
   echo "Starting ORS"
   if ! isrunning; then
-    mkdir -p $RUN_DIR
     /usr/bin/ors >/dev/null 2>&1 &
     local pid=$!
     echo $pid > $PIDFILE
