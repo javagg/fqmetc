@@ -1,5 +1,12 @@
 #!/bin/bash -e
 
+export LOCAL_REPO=~/tmp/local_repo
+mkdir -p $LOCAL_REPO/{x86_64,sources}
+export TMP_BUILD=~/tmp/tito
+rm -rf ~/rpmbuild
+rm -rf $TMP_BUILD
+mkdir -p $TMP_BUILD
+
 BASE_DIR=$(cd "`dirname $0`" && pwd)
 SPEC_FILE="$BASE_DIR/metc.spec"
 BUILD_DIR="/tmp/`basename $BASE_DIR`_build"
@@ -27,3 +34,6 @@ pushd $BUILD_DIR > /dev/null
   eval "sed -i -e 's/^%setup.*$/%setup -q -n ${outfile}/' $SPEC_FILE"
   rpmbuild -ba $SPEC_FILE -D "_sourcedir $BUILD_DIR"
 popd > /dev/null
+
+mv ~/rpmbuild/RPMS/{noarch,x86_64}/* $LOCAL_REPO/x86_64
+mv ~/rpmbuild/SRPMS/* $LOCAL_REPO/sources
