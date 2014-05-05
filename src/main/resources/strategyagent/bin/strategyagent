@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 function usage() {
-  echo "usage: $(basename $0) [-c|--config CONFIG] [-w|--workdir WORKDIR] CMDFILE" 1>&2
+  echo "usage: $(basename $0) [-c|--config CONFIG] [-w|--workdir WORKDIR] cmdfile" 1>&2
 }
 
 # Parse arguments
@@ -22,10 +22,11 @@ while true; do
 done
 
 if [ -z "$1" ]; then
-  echo "Missing CMDFILE"
+  echo "Missing cmdfile"
   usage
   exit 1
 fi
+CMDFILE=$1
 
 METC_HOME=/usr/share/marketcetera
 CONFIG="${CONFIG:-$HOME/strategyagent.conf}"
@@ -70,4 +71,9 @@ EOF
 WORK_DIR=${WORK_DIR:-`pwd`}
 cd $WORK_DIR
 JAVA=`which java`
+
+echo "Running Config:"
+echo "  --config: $CONFIG"
+echo "  --workdir: $WORK_DIR"
+echo "  cmdfile: $CMDFILE"
 exec $JAVA -Xms384m -Xmx600m -XX:MaxPermSize=512m -server -Dorg.marketcetera.appDir=${SA_DIR} -cp $CLASSPATH org.marketcetera.strategyagent.StrategyAgent $* 2>&1

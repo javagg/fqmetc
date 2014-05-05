@@ -100,7 +100,6 @@ ln -s %{homedir}/ors/bin/orsctl %{buildroot}%{_bindir}
 ln -s %{homedir}/ors/bin/ors %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/strategyagent %{buildroot}%{_bindir}
 ln -s %{homedir}/strategyagent/bin/sactl %{buildroot}%{_bindir}
-ln -s %{homedir}/strategyagent/bin/sactl2 %{buildroot}%{_bindir}
 ln -s %{homedir}/orderloader/bin/orderloader %{buildroot}%{_bindir}
 
 # link strategy modules dir to lib
@@ -164,7 +163,6 @@ fi
 %attr(0755,-,-) %{_bindir}/sa_install_inst
 %attr(0755,-,-) %{_bindir}/strategyagent
 %attr(0755,-,-) %{_bindir}/sactl
-%attr(0755,-,-) %{_bindir}/sactl2
 %attr(0755,-,-) %{homedir}/strategyagent/bin/*
 %{homedir}/strategyagent
 %attr(0755,-,-) %{homedir}/bin/sa_install_inst
